@@ -1,0 +1,19 @@
+services:
+  teamspeak:
+    # image: teamspeak
+    build: .
+    restart: unless-stopped
+    ports:
+      - "9987:9987/udp"
+      - "10011:10011"
+      - "10022:10022"
+      - "10080:10080"
+      - "10443:10443"
+      - "30033:30033"
+      - "41144:41144"
+    volumes:
+      - data:/var/lib/teamspeak3-server
+      - logs:/var/log/teamspeak3-server
+volumes:
+  data:
+  logs:
