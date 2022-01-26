@@ -1,2 +1,3 @@
 # docker-alpine-teamspeak
-Docker container for TeamSpeak with Alpine Linux
+
+Docker container for TeamSpeak. Built on top of Alpine Linux.
