@@ -9,17 +9,17 @@ ENV TS3SERVER_LICENSE=accept
 RUN apk add --no-cache ca-certificates libstdc++
 RUN addgroup -g 1000 teamspeak && \
     adduser -u 1000 -Hh /var/lib/teamspeak3-server -G teamspeak -s /sbin/nologin -D teamspeak && \
-    install -d -o teamspeak -g teamspeak -m 775 /var/log/teamspeak3-server /var/lib/teamspeak3-server /teamspeak_temp
+    install -d -o teamspeak -g teamspeak -m 775 /var/log/teamspeak3-server /var/lib/teamspeak3-server /tmp/teamspeak
     
-WORKDIR /teamspeak_temp
+WORKDIR /tmp/teamspeak
 
-ADD teamspeak3-server.ini /teamspeak_temp
+ADD teamspeak3-server.ini /tmp/teamspeak
 
 RUN apk add --no-cache tar && \
     wget "${source_x86_64}" && \ 
     echo "${sha256sums_x86_64}  teamspeak3-server_linux_alpine-${pkgver}.tar.bz2" | sha256sum -c - && \
-    tar -xf teamspeak3-server_linux_alpine-${pkgver}.tar.bz2 --strip-components=1 -C /teamspeak_temp && \
-    rm teamspeak3-server_linux_alpine-${pkgver}.tar.bz2 && \
+    tar -xf "teamspeak3-server_linux_alpine-${pkgver}.tar.bz2" --strip-components=1 -C /tmp/teamspeak && \
+    rm "teamspeak3-server_linux_alpine-${pkgver}.tar.bz2" && \
     \
     install -Dm 644 teamspeak3-server.ini -t "/etc" && \
     install -Dm 644 tsdns/tsdns_settings.ini.sample "/etc/tsdns_settings.ini" && \
@@ -39,7 +39,8 @@ RUN apk add --no-cache tar && \
     find "/usr/share/doc/teamspeak3-server" -type f -exec chmod 644 {} \;   && \
     \
     ldconfig /usr/lib  && \
-    apk del tar
+    apk del tar && \
+    rm -rf /tmp/teamspeak
 
 VOLUME ["/var/lib/teamspeak3-server", "/var/log/teamspeak3-server"]
 WORKDIR /var/lib/teamspeak3-server
