@@ -14,6 +14,9 @@ services:
     volumes:
       - data:/var/lib/teamspeak3-server
       - logs:/var/log/teamspeak3-server
+      #- /absolute/path/to/file.ini:/etc/teamspeak3-server.ini
+      # Default file can be found here:
+      # https://github.com/archlinux/svntogit-community/blob/packages/teamspeak3-server/trunk/teamspeak3-server.ini
 volumes:
   data:
   logs:

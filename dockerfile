@@ -1,47 +1,49 @@
-FROM alpine
+FROM archlinux
 
-ARG pkgver="3.13.6"
-ARG source_x86_64="https://files.teamspeak-services.com/releases/server/${pkgver}/teamspeak3-server_linux_alpine-${pkgver}.tar.bz2"
-ARG sha256sums_x86_64="f30a5366f12b0c5b00476652ebc06d9b5bc4754c4cb386c086758cceb620a8d0"
-
+# Accept the license agreement. You should probably read it before you accept it.
+# Can also create an empty file called .ts3server_license_accepted in working directory.
 ENV TS3SERVER_LICENSE=accept
 
-RUN apk add --no-cache ca-certificates libstdc++
-RUN addgroup -g 1000 teamspeak && \
-    adduser -u 1000 -Hh /var/lib/teamspeak3-server -G teamspeak -s /sbin/nologin -D teamspeak && \
-    install -d -o teamspeak -g teamspeak -m 775 /var/log/teamspeak3-server /var/lib/teamspeak3-server /tmp/teamspeak
-    
-WORKDIR /tmp/teamspeak
+# When we install teamspeak3-server dynamic libraries are copied to /usr/lib.
+ENV LD_LIBRARY_PATH="/usr/lib/:/usr/lib/mariadb/:$LD_LIBRARY_PATH"
 
-ADD teamspeak3-server.ini /tmp/teamspeak
+# Add mirrors for Sweden. You can add your own mirrors to the mirrorlist file. Should probably use reflector.
+ADD mirrorlist /etc/pacman.d/mirrorlist
 
-RUN apk add --no-cache tar && \
-    wget "${source_x86_64}" && \ 
-    echo "${sha256sums_x86_64}  teamspeak3-server_linux_alpine-${pkgver}.tar.bz2" | sha256sum -c - && \
-    tar -xf "teamspeak3-server_linux_alpine-${pkgver}.tar.bz2" --strip-components=1 -C /tmp/teamspeak && \
-    rm "teamspeak3-server_linux_alpine-${pkgver}.tar.bz2" && \
-    \
-    install -Dm 644 teamspeak3-server.ini -t "/etc" && \
-    install -Dm 644 tsdns/tsdns_settings.ini.sample "/etc/tsdns_settings.ini" && \
-    install -Dm 755 ts3server -t "/usr/bin" && \
-    install -Dm 755 tsdns/tsdnsserver -t "/usr/bin" && \
-    install -Dm 644 *.so -t "/usr/lib" && \
-    install -Dm 644 LICENSE -t "/usr/share/licenses/${pkgname}" && \
-    install -d "/usr/share/doc/teamspeak3-server" "/usr/share/teamspeak3-server" && \
-    \ 
-    cp -a doc "/usr/share/doc/teamspeak3-server" && \
-    cp -a serverquerydocs "/usr/share/doc/teamspeak3-server" && \
-    cp -a sql "/usr/share/teamspeak3-server" && \
-    \
-    find "/usr/share/teamspeak3-server" -type d -exec chmod 755 {} \; && \
-    find "/usr/share/teamspeak3-server" -type f -exec chmod 644 {} \; && \
-    find "/usr/share/doc/teamspeak3-server" -type d -exec chmod 755 {} \; && \
-    find "/usr/share/doc/teamspeak3-server" -type f -exec chmod 644 {} \;   && \
-    \
-    ldconfig /usr/lib  && \
-    apk del tar && \
-    rm -rf /tmp/teamspeak
+# NOTE: For Security Reasons, archlinux image strips the pacman lsign key.
+# This is because the same key would be spread to all containers of the same
+# image, allowing for malicious actors to inject packages (via, for example,
+# a man-in-the-middle).
+RUN gpg --refresh-keys && pacman-key --init && pacman-key --populate archlinux
 
+# Set locale. Needed for some programs.
+# https://wiki.archlinux.org/title/locale
+RUN echo "en_US.UTF-8 UTF-8" > "/etc/locale.gen" && locale-gen && echo "LANG=en_US.UTF-8" > "/etc/locale.conf"
+
+# Create a new user with id 1000 and name "lovinator".
+# Home folder is /var/lib/teamspeak3-server where the data for the Teamspeak server is stored.
+# https://linux.die.net/man/8/useradd
+# https://linux.die.net/man/8/groupadd
+RUN groupadd --gid 1000 --system lovinator && \
+    useradd --system --uid 1000 --gid 1000 --comment "TeamSpeak3 Server daemon" lovinator
+
+# Update the system.
+RUN pacman -Syu --noconfirm
+
+# Install Teamspeak3 Server
+# https://archlinux.org/packages/community/x86_64/teamspeak3-server/
+RUN pacman -S teamspeak3-server --noconfirm
+
+# Create data folder and log folder and set permissions.
+# https://linux.die.net/man/1/install
+RUN install --directory /var/lib/teamspeak3-server --owner=lovinator --group=lovinator && \
+    install --directory /var/log/teamspeak3-server/ --owner=lovinator --group=lovinator
+
+# Remove cache. TODO: add more cleanup. Should we remove pacman?
+RUN rm -rf /var/cache/*
+
+# Data is stored in /var/lib/teamspeak3-server
+# Logs are stored in /var/log/teamspeak3-server
 VOLUME ["/var/lib/teamspeak3-server", "/var/log/teamspeak3-server"]
 WORKDIR /var/lib/teamspeak3-server
 
@@ -60,4 +62,9 @@ EXPOSE 10080/tcp
 EXPOSE 10443/tcp
 EXPOSE 41144/tcp
 
-CMD ["ts3server", "inifile=/etc/teamspeak3-server.ini"]
+# Don't run the server as root.
+USER lovinator
+
+# Start the server with our ini file. You need to uncomment the volume 
+# in docker-compose.yml if you want to modify the ini file.
+CMD ["/usr/bin/ts3server", "inifile=/etc/teamspeak3-server.ini"]
