@@ -21,7 +21,6 @@ RUN gpg --refresh-keys && pacman-key --init && pacman-key --populate archlinux
 RUN echo "en_US.UTF-8 UTF-8" >"/etc/locale.gen" && locale-gen && echo "LANG=en_US.UTF-8" >"/etc/locale.conf"
 
 # Create a new user with id 1000 and name "lovinator".
-# Home folder is /var/lib/teamspeak3-server where the data for the Teamspeak server is stored.
 # https://linux.die.net/man/8/useradd
 # https://linux.die.net/man/8/groupadd
 RUN groupadd --gid 1000 --system lovinator && \
@@ -34,7 +33,7 @@ RUN pacman -Syu --noconfirm
 # https://archlinux.org/packages/community/x86_64/teamspeak3-server/
 RUN pacman -S teamspeak3-server --noconfirm
 
-# Create data folder and log folder and set permissions.
+# Create data folder and log folder and set ownership.
 # https://linux.die.net/man/1/install
 RUN install --directory /var/lib/teamspeak3-server --owner=lovinator --group=lovinator && \
 install --directory /var/log/teamspeak3-server/ --owner=lovinator --group=lovinator
@@ -47,20 +46,14 @@ RUN rm -rf /var/cache/*
 VOLUME ["/var/lib/teamspeak3-server", "/var/log/teamspeak3-server"]
 WORKDIR /var/lib/teamspeak3-server
 
-# 9987  (Required)  Voice
-# 30033 (Required)  Filetransfer
-# 10011             ServerQuery (raw)
-# 10022             ServerQuery (SSH)
-# 10080             WebQuery (http)
-# 10443             WebQuery (https)
-# 41144             TSDNS
-EXPOSE 9987/udp
-EXPOSE 30033/tcp
-EXPOSE 10011/tcp
-EXPOSE 10022/tcp
-EXPOSE 10080/tcp
-EXPOSE 10443/tcp
-EXPOSE 41144/tcp
+# 9987/udp              Voice               (Required)
+# 30033/tcp             Filetransfer        (Required)
+# 10011/tcp             ServerQuery Raw
+# 10022/tcp             ServerQuery SSH
+# 10080/tcp             WebQuery HTTP
+# 10443/tcp             WebQuery HTTPS
+# 41144/tcp             TSDNS
+EXPOSE 9987/udp 30033/tcp 10011/tcp 10022/tcp 10080/tcp 10443/tcp 41144/tcp
 
 # Don't run the server as root.
 USER lovinator

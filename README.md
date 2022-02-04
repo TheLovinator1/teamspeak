@@ -23,15 +23,15 @@ With the first startup TeamSpeak creates the SQLite database at `/var/lib/teamsp
 
 ## Ports
 
-| Port  | Description       | Required |
-| ----- | ----------------- | -------- |
-| 9987  | Voice             | Yes      |
-| 30033 | File transfer     | Yes      |
-| 10011 | ServerQuery (raw) | No       |
-| 10022 | ServerQuery (SSH) | No       |
-| 10080 | WebQuery (http)   | No       |
-| 10443 | WebQuery (https)  | No       |
-| 41144 | TSDNS             | No       |
+| Port      | Description       | Required |
+| --------- | ----------------- | -------- |
+| 9987/udp  | Voice             | Yes      |
+| 30033/tcp | File transfer     | Yes      |
+| 10011/tcp | ServerQuery (raw) | No       |
+| 10022/tcp | ServerQuery (SSH) | No       |
+| 10080/tcp | WebQuery (http)   | No       |
+| 10443/tcp | WebQuery (https)  | No       |
+| 41144/tcp | TSDNS             | No       |
 
 TeamSpeak 3 servers will communicate with the following addresses:
 
