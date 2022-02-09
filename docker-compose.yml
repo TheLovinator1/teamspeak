@@ -1,7 +1,7 @@
 services:
   teamspeak:
-    # image: teamspeak
-    build: .
+    image: ghcr.io/thelovinator1/teamspeak:master
+    # build: .
     restart: unless-stopped
     ports:
       - "9987:9987/udp"
