@@ -1,11 +1,14 @@
 # TeamSpeak3 Server
 
-TeamSpeak is proprietary Voice over IP software that allows computer users to speak on a chat channel with fellow computer users, much like a telephone conference call.
+TeamSpeak is proprietary Voice over IP software that allows computer users to speak on a chat channel with fellow
+computer users, much like a telephone conference call.
 
 ## Docker
 
-This Docker image is using the [Arch Linux](https://hub.docker.com/_/archlinux/) as base image. The TeamSpeak server runs as a user with the id `1000`.
-If you possess a license file please copy it to the data volumes root. (`/var/lib/teamspeak3-server/licensekey.dat` in container).
+This Docker image is using the [Arch Linux](https://hub.docker.com/_/archlinux/) as base image. The TeamSpeak server
+runs as a user with the id `1000`.
+If you possess a license file please copy it to the data volumes root. (`/var/lib/teamspeak3-server/licensekey.dat` in
+container).
 
 ## Requirements
 
@@ -13,12 +16,19 @@ SSE2 capable CPU. Only 64-bit support, no ARM.
 
 ## First startup
 
-With the first startup TeamSpeak creates the SQLite database at `/var/lib/teamspeak3-server/ts3server.sqlitedb` and starts logging its standard output in files in: `/var/log/teamspeak3-server/`. TeamSpeak also creates the first ServerQuery administration account (the superuser) and the first virtual server including a privilege key for the server administrator of this virtual server. The privilege key is only displayed once on standard output. Alternatively, you can navigate to the logs volume and read the output log directly. (This is a persistent file and will still have the first startup output here even if you have restarted the server):
+With the first startup TeamSpeak creates the SQLite database at `/var/lib/teamspeak3-server/ts3server.sqlitedb` and
+starts logging its standard output in files in: `/var/log/teamspeak3-server/`. TeamSpeak also creates the first
+ServerQuery administration account (the superuser) and the first virtual server including a privilege key for the server
+administrator of this virtual server. The privilege key is only displayed once on standard output. Alternatively, you
+can navigate to the logs volume and read the output log directly. (This is a persistent file and will still have the
+first startup output here even if you have restarted the server):
 
 ## Starting Teamspeak with disabled IPv6 stack
 
 - Uncomment `- /absolute/path/to/file.ini:/etc/teamspeak3-server.ini` in docker-compose.yml
-- Download [teamspeak3-server.ini](https://github.com/archlinux/svntogit-community/blob/packages/teamspeak3-server/trunk/teamspeak3-server.ini) and add the path to the file to the docker-compose.yml file.
+-
+Download [teamspeak3-server.ini](https://github.com/archlinux/svntogit-community/blob/packages/teamspeak3-server/trunk/teamspeak3-server.ini)
+and add the path to the file to the docker-compose.yml file.
 - Change `query_ip=0.0.0.0, ::` to `query_ip=0.0.0.0`
 
 ## Ports
@@ -42,7 +52,8 @@ TeamSpeak 3 servers will communicate with the following addresses:
 | ts3services.teamspeak.com | TCP      | 1024-65535 (random by OS)   | 443         | TeamSpeak 3 Server versions 3.1.x |
 | weblist.teamspeak.com     | UDP      | 2011-2110 (first available) | 2010        | all server versions               |
 
-If you need to use a proxy to connect to the TeamSpeak 3 Server, you can add the following to the `/etc/teamspeak3-server.ini` file:
+If you need to use a proxy to connect to the TeamSpeak 3 Server, you can add the following to
+the `/etc/teamspeak3-server.ini` file:
 
     http_proxy=my.proxy.example:1234
     http_proxy=192.0.2.1:1234
@@ -52,7 +63,8 @@ The proxy provided must not require authentication, as that is not supported by 
 
 ## Files
 
-The following files and folders need to copied if you want to retain the respective information. Don't forget to use an persistent volume for the data volume.:
+The following files and folders need to copied if you want to retain the respective information. Don't forget to use an
+persistent volume for the data volume.:
 
 | File                   | Description                                                                                                                                  |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
