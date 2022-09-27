@@ -1,3 +1,8 @@
+# Don't use this :-)
+
+Better containers are out there, you should use the [official Teamspeak image](https://hub.docker.com/_/teamspeak)
+instead.
+
 # TeamSpeak3 Server
 
 TeamSpeak is proprietary Voice over IP software that allows computer users to speak on a chat channel with fellow
@@ -26,15 +31,16 @@ first startup output here even if you have restarted the server):
 ## Starting Teamspeak with disabled IPv6 stack
 
 - Uncomment `- /absolute/path/to/file.ini:/etc/teamspeak3-server.ini` in docker-compose.yml
--
+
 Download [teamspeak3-server.ini](https://github.com/archlinux/svntogit-community/blob/packages/teamspeak3-server/trunk/teamspeak3-server.ini)
 and add the path to the file to the docker-compose.yml file.
+
 - Change `query_ip=0.0.0.0, ::` to `query_ip=0.0.0.0`
 
 ## Ports
 
 | Port      | Description       | Required |
-| --------- | ----------------- | -------- |
+|-----------|-------------------|----------|
 | 9987/udp  | Voice             | Yes      |
 | 30033/tcp | File transfer     | Yes      |
 | 10011/tcp | ServerQuery (raw) | No       |
@@ -46,7 +52,7 @@ and add the path to the file to the docker-compose.yml file.
 TeamSpeak 3 servers will communicate with the following addresses:
 
 | Domain                    | Protocol | Local Port (Server)         | Remote Port | Notes                             |
-| ------------------------- | -------- | --------------------------- | ----------- | --------------------------------- |
+|---------------------------|----------|-----------------------------|-------------|-----------------------------------|
 | accounting.teamspeak.com  | TCP      | 1024-65535 (random by OS)   | 2008        | TeamSpeak 3 Server versions 3.0.x |
 | accounting2.teamspeak.com | TCP      | 1024-65535 (random by OS)   | 443         | TeamSpeak 3 Server versions 3.1.x |
 | ts3services.teamspeak.com | TCP      | 1024-65535 (random by OS)   | 443         | TeamSpeak 3 Server versions 3.1.x |
@@ -67,7 +73,7 @@ The following files and folders need to copied if you want to retain the respect
 persistent volume for the data volume.:
 
 | File                   | Description                                                                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+|------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
 | licensekey.dat         | This file contains your license.                                                                                                             |
 | query_ip_allowlist.txt | Whitelisted IPs for the query interface                                                                                                      |
 | query_ip_denylist.txt  | Blacklisted IPs for the query interface                                                                                                      |
@@ -78,5 +84,4 @@ persistent volume for the data volume.:
 
 - Email: [tlovinator@gmail.com](mailto:tlovinator@gmail.com)
 - Discord: TheLovinator#9276
-- Steam: [TheLovinator](https://steamcommunity.com/id/TheLovinator/)
-- Send an issue: [docker-arch-teamspeak/issues](https://github.com/TheLovinator1/docker-arch-teamspeak/issues)
+- Send an issue: [teamspeak/issues](https://github.com/TheLovinator1/teamspeak/issues)
